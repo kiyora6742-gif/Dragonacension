@@ -1,0 +1,37 @@
+name: Build Dragon Ascension
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Baixar código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 8
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '8'
+
+      - name: Configurar Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '6.9.1'
+
+      - name: Preparar projeto
+        run: gradle --no-daemon setupDecompWorkspace --stacktrace
+
+      - name: Compilar mod
+        run: gradle --no-daemon clean build --stacktrace
+
+      - name: Salvar JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: DragonAscension-JAR
+          path: build/libs/*.jar
